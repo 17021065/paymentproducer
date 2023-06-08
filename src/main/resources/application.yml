@@ -1,0 +1,27 @@
+spring:
+  profiles:
+    active: default
+  redis:
+    host: 10.22.22.20
+    port: 26379
+    password: vnpayredis@123
+    timeout: 60000
+    database: 15
+    sentinel:
+      master: redismaster
+      nodes: 10.22.22.20:26379,10.22.22.21:26379,10.22.22.22:26379
+    jedis:
+      pool:
+        max-active: 10
+        max-idle: 5
+        min-idle: 2
+  rabbitmq:
+    host: 10.20.27.15
+    port: 5672
+    username: qrcode
+    password: qrcode
+    requested-heartbeat: 45
+    virtual-host: qrcode
+    cache:
+      channel:
+        size: 10
