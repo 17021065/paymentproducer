@@ -5,12 +5,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import vn.vnpay.paymentproducer.constant.BaseResponse;
 import vn.vnpay.paymentproducer.bean.PaymentRequestWithItem;
 import vn.vnpay.paymentproducer.bean.PaymentResponse;
+import vn.vnpay.paymentproducer.constant.BaseResponse;
 import vn.vnpay.paymentproducer.constant.Constant;
 import vn.vnpay.paymentproducer.producer.RabbitMQProducer;
 import vn.vnpay.paymentproducer.service.PaymentService;
+import vn.vnpay.paymentproducer.utils.date.DateUtils;
 import vn.vnpay.paymentproducer.utils.validate.Validator;
 
 import java.text.SimpleDateFormat;
@@ -45,6 +46,9 @@ public class PaymentServiceImpl implements PaymentService {
 
             log.info("Cache data: hash=[{}], hashKey=[{}], hashValue=[{}]", traceTransferHashName, request.getTraceTransfer(), today);
             redisTemplate.opsForHash().put(traceTransferHashName, request.getTraceTransfer(), today);
+
+            redisTemplate.expireAt(tokenKeyHashName, DateUtils.endOfToday());
+            redisTemplate.expireAt(traceTransferHashName, DateUtils.endOfToday());
 
             log.info("RabbitMQ message sent: {}", objectMapper.writeValueAsString(request));
             rabbitMQProducer.sendMessage(objectMapper.writeValueAsString(request));
